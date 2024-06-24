@@ -2,77 +2,74 @@ const axios = require("axios");
 const loraService = require("../services/lora.service")
 const { parseApiError } = require("../common/parseApiError")
 
-const baseURL = 'https://vantiva.eu1.cloud.thethings.industries/api/v3';
-
-
 const getAllGateways = async (req, res) => {
 
   try {
     const gateways = await loraService.getAllGateways()
 
     res.status(200).send(gateways)
-  } catch (e) {
-    console.error(`An error occurred while getting the gateways from lora`, e.message)
+  } catch (err) {
+    console.error(`An error occurred while getting the gateways from lora`, err.message)
 
-    const { errorMessage, status } = parseApiError(e)
+    const { errorMessage, status } = parseApiError(err)
 
     res.status(status).send({ status, errorMessage })
   }
 }
 
-// const getAllGateways = async (req, res) => {
-//   const authHeader = req.headers['authorization'];
-
-//   try {
-//     const response = await axios.get(`${baseURL}/gateways`, {
-//       headers: {
-//         'Authorization': authHeader,
-//         'Content-Type': 'application/json'
-//       }
-//     });
-//     res.status(200).send(response.data);
-//   } catch (err) {
-//     console.error('Error:', err.response ? err.response.data : err.message);
-//     res.status(err.response ? err.response.status : 500).send(err.response ? err.response.data : { error: 'Internal Server Error' });
-//   }
-// }
-
-// To create a gateway in LoRa Network
-const createGateway = async (req, res) => {
-  const authHeader = req.headers['authorization'];
-  const data = req.body;
-  const organization_id = "vantiva-test"
-
+const getGatewayById = async (req, res) => {
+  const {
+    params: { gatewayId }
+  } = req
   try {
-    const response = await axios.post(`${baseURL}/organizations/${organization_id}/gateways`, data, {
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json'
-      }
-    });
-    res.status(200).send(response.data);
-  } catch (err) {
-    console.error('Error:', err.response ? err.response.data : err.message);
-    res.status(err.response ? err.response.status : 500).send(err.response ? err.response.data : { error: 'Internal Server Error' });
-  }
-};
+    const gateway = await loraService.getGatewayById(gatewayId);
 
-const deleteGateway = async (req, res) => {
-  const authHeader = req.headers['authorization']
-  const gatewayId = req.params.id;
-
-  try {
-    const response = await axios.delete(`${baseURL}/gateways/${gatewayId}`, {
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json'
-      }
-    })
-    res.status(200).send(response.data)
+    res.status(200).send(gateway)
   } catch (err) {
-    console.error('Error:', err.response ? err.response.data : err.message);
-    res.status(err.response ? err.response.status : 500).send(err.response ? err.response.data : { error: 'Internal Server Error' });
+    console.error(`An error occurred while getting the gateways from lora`, err.message)
+
+    const { errorMessage, status } = parseApiError(err)
+
+    res.status(status).send({ status, errorMessage })
   }
 }
 
-module.exports = { getAllGateways, createGateway, deleteGateway };
+const createGateway = async (req, res) => {
+  const {
+    params: { organizationId },
+    body: payload,
+  } = req
+
+  try {
+    const response = await loraService.createGatewayByOrganizationId(organizationId, payload);
+
+    res.status(201).send(response)
+  } catch (err) {
+    console.error(`An error occurred while creating gateway`, err.message)
+
+    const { errorMessage, status } = parseApiError(err)
+
+    res.status(status).send({ status, errorMessage })
+  }
+}
+
+const deleteGateway = async (req, res) => {
+  const {
+    params: { gatewayId }
+  } = req
+
+  try {
+    const response = await loraService.deleteGatewayByGatewayId(gatewayId)
+
+    res.status(200).send(response)
+  } catch (err) {
+    console.error(`An error occurred while deleting gateway with gatewayId: ${gatewayId}`, err.message)
+
+    const { errorMessage, status } = parseApiError(err)
+
+    res.status(status).send({ status, errorMessage })
+  }
+}
+
+
+module.exports = { getAllGateways, getGatewayById, createGateway, deleteGateway };

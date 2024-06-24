@@ -1,22 +1,12 @@
 const axios = require("axios");
 const httpContext = require("express-http-context")
-const { AUTHORIZATION_HEADER, ACCESS_TOKEN_KEY, TOKEN_PREFIX } = require('../common/constants')
+const { AUTHORIZATION_HEADER } = require('../common/constants')
 
-/**
- * Creates an Axios instance with a given base URL and common interceptors.
- * @param {string} baseUrl - The base URL for the Axios instance.
- * @returns {AxiosInstance} Configured Axios instance.
- */
 
-const createLoraClient = baseUrl => {
+const createLoraClient = (baseUrl) => {
   const client = axios.create({ baseURL: baseUrl })
 
-  /**
-   * Interceptor function to add the Authorization header.
-   * @param {Object} config - The Axios request configuration.
-   * @returns {Object} The modified or original configuration.
-  */
-  const addAuthorizationHeader = config => {
+  const addAuthorizationHeader = (config) => {
     const accessToken = process.env.LORA_SECRET
 
     if (accessToken && !config.headers[AUTHORIZATION_HEADER]) {
@@ -24,7 +14,7 @@ const createLoraClient = baseUrl => {
         ...config,
         headers: {
           ...config.headers,
-          [AUTHORIZATION_HEADER]: `${TOKEN_PREFIX} ${accessToken}`,
+          [AUTHORIZATION_HEADER]: `Bearer ${accessToken}`,
         },
       }
     }

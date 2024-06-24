@@ -1,7 +1,22 @@
-const getGatewaysByGatewayEndPoint = () => {
-  return `/api/v3/gateways`
+const getGatewaysEndPoint = () => {
+  return `/gateways`
+}
+
+const getGatewayByIdEndPoint = (gatewayId) => {
+  return `gateways/${gatewayId}`
+}
+
+const getCreateGatewayByOrganizationIdEndPoint = (organizationId) => {
+  return `/organizations/${organizationId}/gateways`
+}
+
+const getDeleteGatewayByGatewayIdEndPoint = (gatewayId) => {
+  return `gateways/${gatewayId}`
 }
 
 module.exports = {
-  getGatewaysByGatewayEndPoint
+  getGatewaysEndPoint,
+  getGatewayByIdEndPoint,
+  getCreateGatewayByOrganizationIdEndPoint,
+  getDeleteGatewayByGatewayIdEndPoint
 }
